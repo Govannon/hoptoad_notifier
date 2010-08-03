@@ -379,3 +379,19 @@ When /^I configure the application to filter parameter "([^\"]*)"$/ do |paramete
    end
   end
 end
+
+Then /^I should see the notifier JavaScript for the following:$/ do |table|
+  hash = table.hashes.first
+  host        = hash['host']        || 'hoptoadapp.com'
+  api_key     = hash['api_key']
+  environment = hash['environment'] || 'production'
+
+  response = Nokogiri::HTML.parse('<html>' + @terminal.output.split('<html>').last)
+  response.css("script[type='text/javascript'][src='http://#{host}/javascripts/notifier.js']").first.should_not be_nil
+  response.css("script[type='text/javascript']:last-child").each do |element|
+    content = element.content
+    content.should include("Hoptoad.setKey('#{api_key}');")
+    content.should include("Hoptoad.setHost('#{host}');")
+    content.should include("Hoptoad.setEnvironment('#{environment}');")
+  end
+end

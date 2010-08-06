@@ -32,7 +32,7 @@ module HoptoadNotifier
           javascript = render_to_string(options)
         end
 
-        if response.body.respond_to?(:gsub)
+        if response.body.respond_to?(:gsub) && javascript
           response.body = response.body.gsub(/<(head)>/i, "<\\1>\n" + javascript)
         end
       end
